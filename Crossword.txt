@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bill of Rights Crossword</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    .grid { display: grid; grid-template-columns: repeat(10, 40px); gap: 2px; margin: 20px 0; }
+    .cell {
+      width: 40px; height: 40px;
+      background: white;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    .cell input {
+      width: 100%; height: 100%;
+      border: none;
+      text-align: center;
+      font-size: 20px;
+      text-transform: uppercase;
+    }
+    .cell input.correct {
+      background-color: #c8e6c9;
+    }
+    .badge {
+      display: none;
+      background: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .clues { display: flex; gap: 40px; }
+    .clues div { width: 50%; }
+    .clues h2 { margin-bottom: 10px; }
+    .clues ol { padding-left: 20px; }
+    button {
+      margin: 10px 10px 0 0;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    @media print {
+      button, .badge { display: none; }
+      input { border: none; color: black; font-weight: bold; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Bill of Rights Vocabulary Crossword</h1>
+  <div class="grid" id="crossword-grid"></div>
+  <button onclick="checkAnswers()">Check Answers</button>
+  <button onclick="resetPuzzle()">Reset Puzzle</button>
+  <button onclick="window.print()">🖨️ Print This Crossword</button>
+  <button onclick="showAnswers()">📄 Print Answer Key</button>
+  <div class="badge" id="completionBadge">🎉 Congrats! You solved the puzzle!</div>
+  <div class="clues">
+    <div>
+      <h2>Across</h2>
+      <ol>
+        <li><strong>Amendment</strong>: A change or addition to the Constitution</li>
+        <li><strong>Rights</strong>: Freedoms that belong to every citizen</li>
+        <li><strong>Speech</strong>: The First Amendment protects this type of expression</li>
+        <li><strong>Jury</strong>: A group of citizens who decide the outcome of a trial</li>
+        <li><strong>Press</strong>: The right to publish news or opinions without government control</li>
+      </ol>
+    </div>
+    <div>
+      <h2>Down</h2>
+      <ol>
+        <li><strong>Search</strong>: The Fourth Amendment protects against unreasonable ones</li>
+        <li><strong>Trial</strong>: A public legal proceeding to decide if someone broke the law</li>
+        <li><strong>Warrant</strong>: A legal paper that allows searches or arrests</li>
+        <li><strong>Arms</strong>: The Second Amendment gives the right to bear these</li>
+        <li><strong>Religion</strong>: You have the right to practice this freely under the First Amendment</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const grid = document.getElementById("crossword-grid");
+    const badge = document.getElementById("completionBadge");
+    let inputRefs = [];
+
+    const solutionGrid = Array(10).fill(null).map(() => Array(10).fill(""));
+
+    const answers = [
+      { word: "AMENDMENT", row: 0, col: 0, dir: "across" },
+      { word: "RIGHTS", row: 2, col: 0, dir: "across" },
+      { word: "SPEECH", row: 4, col: 0, dir: "across" },
+      { word: "JURY", row: 6, col: 0, dir: "across" },
+      { word: "PRESS", row: 8, col: 0, dir: "across" },
+      { word: "SEARCH", row: 0, col: 2, dir: "down" },
+      { word: "TRIAL", row: 0, col: 4, dir: "down" },
+      { word: "WARRANT", row: 0, col: 6, dir: "down" },
+      { word: "ARMS", row: 0, col: 8, dir: "down" },
+      { word: "RELIGION", row: 0, col: 9, dir: "down" },
+    ];
+
+    answers.forEach(({ word, row, col, dir }) => {
+      for (let i = 0; i < word.length; i++) {
+        if (dir === "across") solutionGrid[row][col + i] = word[i];
+        else if (dir === "down") solutionGrid[row + i][col] = word[i];
+      }
+    });
+
+    for (let r = 0; r < 10; r++) {
+      for (let c = 0; c < 10; c++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        if (solutionGrid[r][c]) {
+          const input = document.createElement("input");
+          input.setAttribute("maxlength", "1");
+          input.dataset.solution = solutionGrid[r][c];
+          inputRefs.push(input);
+          cell.appendChild(input);
+        }
+        grid.appendChild(cell);
+      }
+    }
+
+    function checkAnswers() {
+      let allCorrect = true;
+      inputRefs.forEach(input => {
+        const correct = input.dataset.solution.toUpperCase();
+        const guess = input.value.toUpperCase();
+        if (guess === correct) {
+          input.classList.add("correct");
+        } else {
+          input.classList.remove("correct");
+          allCorrect = false;
+        }
+      });
+      if (allCorrect) {
+        badge.style.display = 'inline-block';
+      }
+    }
+
+    function resetPuzzle() {
+      inputRefs.forEach(input => {
+        input.value = "";
+        input.classList.remove("correct");
+      });
+      badge.style.display = 'none';
+    }
+
+    function showAnswers() {
+      inputRefs.forEach(input => {
+        input.value = input.dataset.solution;
+        input.classList.add("correct");
+      });
+      badge.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
